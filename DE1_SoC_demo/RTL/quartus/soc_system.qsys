@@ -17,12 +17,124 @@
          type = "String";
       }
    }
+   element buttons_0
+   {
+      datum _sortIndex
+      {
+         value = "8";
+         type = "int";
+      }
+   }
+   element buttons_0.s1
+   {
+      datum baseAddress
+      {
+         value = "96";
+         type = "String";
+      }
+   }
    element clk_0
    {
       datum _sortIndex
       {
          value = "0";
          type = "int";
+      }
+   }
+   element hex_0
+   {
+      datum _sortIndex
+      {
+         value = "9";
+         type = "int";
+      }
+   }
+   element hex_0.s1
+   {
+      datum baseAddress
+      {
+         value = "80";
+         type = "String";
+      }
+   }
+   element hex_1
+   {
+      datum _sortIndex
+      {
+         value = "10";
+         type = "int";
+      }
+   }
+   element hex_1.s1
+   {
+      datum baseAddress
+      {
+         value = "64";
+         type = "String";
+      }
+   }
+   element hex_2
+   {
+      datum _sortIndex
+      {
+         value = "11";
+         type = "int";
+      }
+   }
+   element hex_2.s1
+   {
+      datum baseAddress
+      {
+         value = "48";
+         type = "String";
+      }
+   }
+   element hex_3
+   {
+      datum _sortIndex
+      {
+         value = "12";
+         type = "int";
+      }
+   }
+   element hex_3.s1
+   {
+      datum baseAddress
+      {
+         value = "32";
+         type = "String";
+      }
+   }
+   element hex_4
+   {
+      datum _sortIndex
+      {
+         value = "13";
+         type = "int";
+      }
+   }
+   element hex_4.s1
+   {
+      datum baseAddress
+      {
+         value = "16";
+         type = "String";
+      }
+   }
+   element hex_5
+   {
+      datum _sortIndex
+      {
+         value = "14";
+         type = "int";
+      }
+   }
+   element hex_5.s1
+   {
+      datum baseAddress
+      {
+         value = "0";
+         type = "String";
       }
    }
    element hps_0
@@ -141,7 +253,42 @@
  <parameter name="timeStamp" value="0" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <instanceScript></instanceScript>
+ <interface
+   name="buttons_0_external_connection"
+   internal="buttons_0.external_connection"
+   type="conduit"
+   dir="end" />
  <interface name="clk" internal="clk_0.clk_in" type="clock" dir="end" />
+ <interface
+   name="hex_0_external_connection"
+   internal="hex_0.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="hex_1_external_connection"
+   internal="hex_1.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="hex_2_external_connection"
+   internal="hex_2.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="hex_3_external_connection"
+   internal="hex_3.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="hex_4_external_connection"
+   internal="hex_4.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="hex_5_external_connection"
+   internal="hex_5.external_connection"
+   type="conduit"
+   dir="end" />
  <interface name="hps_0_ddr" internal="hps_0.memory" type="conduit" dir="end" />
  <interface name="hps_0_io" internal="hps_0.hps_io" type="conduit" dir="end" />
  <interface
@@ -161,11 +308,109 @@
    internal="switches_0.external_connection"
    type="conduit"
    dir="end" />
+ <module name="buttons_0" kind="altera_avalon_pio" version="14.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="4" />
+ </module>
  <module name="clk_0" kind="clock_source" version="14.1" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
   <parameter name="clockFrequencyKnown" value="true" />
   <parameter name="inputClockFrequency" value="0" />
   <parameter name="resetSynchronousEdges" value="NONE" />
+ </module>
+ <module name="hex_0" kind="altera_avalon_pio" version="14.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="127" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="7" />
+ </module>
+ <module name="hex_1" kind="altera_avalon_pio" version="14.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="127" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="7" />
+ </module>
+ <module name="hex_2" kind="altera_avalon_pio" version="14.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="127" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="7" />
+ </module>
+ <module name="hex_3" kind="altera_avalon_pio" version="14.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="127" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="7" />
+ </module>
+ <module name="hex_4" kind="altera_avalon_pio" version="14.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="127" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="7" />
+ </module>
+ <module name="hex_5" kind="altera_avalon_pio" version="14.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="127" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="7" />
  </module>
  <module name="hps_0" kind="altera_hps" version="14.1" enabled="1">
   <parameter name="ABSTRACT_REAL_COMPARE_TEST" value="false" />
@@ -1151,6 +1396,69 @@
  <connection
    kind="avalon"
    version="14.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="buttons_0.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0060" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="14.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="hex_0.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0050" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="14.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="hex_1.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0040" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="14.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="hex_2.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0030" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="14.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="hex_3.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0020" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="14.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="hex_4.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0010" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="14.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="hex_5.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="14.1"
    start="nios2_qsys_0.instruction_master"
    end="nios2_qsys_0.jtag_debug_module">
   <parameter name="arbitrationPriority" value="1" />
@@ -1183,6 +1491,13 @@
    version="14.1"
    start="pll_0.outclk0"
    end="switches_0.clk" />
+ <connection kind="clock" version="14.1" start="pll_0.outclk0" end="buttons_0.clk" />
+ <connection kind="clock" version="14.1" start="pll_0.outclk0" end="hex_0.clk" />
+ <connection kind="clock" version="14.1" start="pll_0.outclk0" end="hex_1.clk" />
+ <connection kind="clock" version="14.1" start="pll_0.outclk0" end="hex_2.clk" />
+ <connection kind="clock" version="14.1" start="pll_0.outclk0" end="hex_3.clk" />
+ <connection kind="clock" version="14.1" start="pll_0.outclk0" end="hex_4.clk" />
+ <connection kind="clock" version="14.1" start="pll_0.outclk0" end="hex_5.clk" />
  <connection
    kind="clock"
    version="14.1"
@@ -1226,6 +1541,17 @@
    version="14.1"
    start="clk_0.clk_reset"
    end="nios2_qsys_0.reset_n" />
+ <connection
+   kind="reset"
+   version="14.1"
+   start="hps_0.h2f_reset"
+   end="buttons_0.reset" />
+ <connection kind="reset" version="14.1" start="hps_0.h2f_reset" end="hex_0.reset" />
+ <connection kind="reset" version="14.1" start="hps_0.h2f_reset" end="hex_1.reset" />
+ <connection kind="reset" version="14.1" start="hps_0.h2f_reset" end="hex_2.reset" />
+ <connection kind="reset" version="14.1" start="hps_0.h2f_reset" end="hex_3.reset" />
+ <connection kind="reset" version="14.1" start="hps_0.h2f_reset" end="hex_4.reset" />
+ <connection kind="reset" version="14.1" start="hps_0.h2f_reset" end="hex_5.reset" />
  <connection
    kind="reset"
    version="14.1"
