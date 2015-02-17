@@ -17,7 +17,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity de1_soc_top_level is
+entity DE1_SoC_top_level is
     port (
         -- ADC
         ADC_CS_n          : out   std_logic;
@@ -160,9 +160,9 @@ entity de1_soc_top_level is
         HPS_USB_NXT       : in    std_logic;
         HPS_USB_STP       : out   std_logic
     );
-end entity de1_soc_top_level;
+end entity DE1_SoC_top_level;
 
-architecture rtl of de1_soc_top_level is
+architecture rtl of DE1_SoC_top_level is
 
 begin
 
