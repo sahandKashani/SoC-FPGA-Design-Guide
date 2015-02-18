@@ -1,0 +1,56 @@
+###############################################################################
+# debug_setup.ds
+#
+# Author        : Sahand Kashani-Akhavan from Altera documentation
+# Revision      : 1.0
+# Creation date : 18/02/2015
+#
+# You can instruct ARM DS-5 to use this script in a debug configuration.
+###############################################################################
+
+# Reset and stop the system.
+stop
+wait 5s
+reset system
+wait 5s
+
+# Delete all breakpoints.
+delete breakpoints
+
+# Disable semihosting
+set semihosting enabled false
+
+# Load the preloader.
+loadfile "$sdir/../../preloader/uboot-socfpga/spl/u-boot-spl" 0x0
+
+# Enable semihosting to allow printing even if you don't have a uart module
+# available.
+set semihosting enabled true
+
+# Set a breakpoint at the "spl_boot_device()" function. This function is the
+# last step of the preloader. It looks for a boot device (qspi flash, sdcard,
+# fpga), and jumps to that address. For our bare-metal programs, we don't want
+# to use any boot device, but want to run our own program, so we want the
+# processor to stop here. Then, we will modify its execution to make it run our
+# program.
+tbreak spl_boot_device
+
+# Set the PC register to the entry point address previously recorded by the
+# "load" or "loadfile" command and start running the target.
+run
+
+# Instruct the debugger to wait until either the application completes or a
+# breakpoint is hit. In our case, it will hit the breakpoint.
+wait
+
+# Load our bare-metal program.
+loadfile "$sdir/Debug/<baremetal_binary_file>.axf"
+
+# Set a breakpoint at our program's "main()" function.
+tbreak main
+
+# Start running the target.
+run
+
+# wait at main().
+wait
