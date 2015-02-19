@@ -76,7 +76,7 @@ void set_hex_displays(uint32_t value) {
 	}
 }
 
-void toggle_hps_led() {
+void handle_hps_led() {
     uint32_t hps_gpio_input = alt_gpio_port_data_read(HPS_KEY_PORT, HPS_KEY_MASK);
 
     // HPS_KEY is active-low
@@ -96,37 +96,37 @@ bool is_fpga_button_pressed(uint32_t button_number) {
 	return ((~alt_read_word(fpga_buttons)) & (1 << button_number));
 }
 
-// button 0 = increment (1)/decrement (0) (active-low)
+void handle_hex_displays(uint32_t *hex_counter) {
+    // FPGA button 0 will invert the counting direction
+    if (is_fpga_button_pressed(0)) {
+        hex_increment = !hex_increment;
+    }
+
+    if (hex_increment) {
+        *hex_counter += 1;
+    } else {
+        *hex_counter -= 1;
+    }
+
+    // FPGA button 1 will reset the counter to 0
+    if (is_fpga_button_pressed(1)) {
+        *hex_counter = 0;
+    }
+
+    // restrict hex_counter_uint to HEX_DISPLAY_COUNT digits
+    *hex_counter &= HEX_COUNTER_MASK;
+    set_hex_displays(*hex_counter);
+}
+
 int main() {
 	printf("DE1-SoC bare-metal demo\n");
+
 	setup_peripherals();
 
-	uint32_t hex_counter_uint = 0;
-
+	uint32_t hex_counter = 0;
 	while (true) {
-		// FPGA button 0 will invert the counting direction
-		if (is_fpga_button_pressed(0)) {
-			hex_increment = !hex_increment;
-		}
-
-		if (hex_increment) {
-			hex_counter_uint += 1;
-		} else {
-			hex_counter_uint -= 1;
-		}
-
-        // FPGA button 1 will reset the counter to 0
-		if (is_fpga_button_pressed(1)) {
-		    hex_counter_uint = 0;
-		}
-
-		// restrict hex_counter_uint to HEX_DISPLAY_COUNT digits
-		hex_counter_uint &= HEX_COUNTER_MASK;
-
-		set_hex_displays(hex_counter_uint);
-
-		toggle_hps_led();
-
+	    handle_hex_displays(&hex_counter);
+		handle_hps_led();
 		delay_us(ALT_MICROSECS_IN_A_SEC / 10);
 	}
 

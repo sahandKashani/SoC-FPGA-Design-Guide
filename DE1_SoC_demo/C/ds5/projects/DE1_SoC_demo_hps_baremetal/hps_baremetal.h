@@ -74,7 +74,8 @@ void setup_hex_displays();
 void setup_hps_gpio();
 void delay_us(uint32_t us);
 void set_hex_displays(uint32_t value);
-void toggle_hps_led();
+void handle_hps_led();
 bool is_fpga_button_pressed(uint32_t button_number);
+void handle_hex_displays();
 
 #endif
