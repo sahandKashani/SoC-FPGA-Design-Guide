@@ -8,6 +8,7 @@
 #include "alt_globaltmr.h"
 #include "hps_baremetal.h"
 #include "hwlib.h"
+#include "socal/alt_gpio.h"
 #include "socal/hps.h"
 #include "socal/socal.h"
 #include "../hps_soc_system.h"
@@ -86,7 +87,7 @@ void toggle_hps_led() {
         hps_led_value >>= HPS_LED_PORT_BIT;
         hps_led_value = !hps_led_value;
         hps_led_value <<= HPS_LED_PORT_BIT;
-        assert(ALT_E_SUCCESS == alt_gpio_port_data_write(HPS_LED_PORT, HPS_LED_MASK, HPS_LED_PORT_BIT));
+        assert(ALT_E_SUCCESS == alt_gpio_port_data_write(HPS_LED_PORT, HPS_LED_MASK, hps_led_value));
     }
 }
 
