@@ -62,16 +62,19 @@ void set_hex_displays(uint32_t value) {
 	char current_char[2] = " \0";
 	char hex_counter_hex_string[HEX_DISPLAY_COUNT + 1];
 
-    // get hex string representation of hex_counter
+    // get hex string representation of input value on HEX_DISPLAY_COUNT 7-segment displays
     snprintf(hex_counter_hex_string, HEX_DISPLAY_COUNT + 1, "%0*x", HEX_DISPLAY_COUNT, (unsigned int) value);
 
 	uint32_t hex_display_index = 0;
 	for (hex_display_index = 0; hex_display_index < HEX_DISPLAY_COUNT; hex_display_index++) {
 		current_char[0] = hex_counter_hex_string[HEX_DISPLAY_COUNT - hex_display_index - 1];
 
+		// get decimal representation for this 7-segment display
 		uint32_t number = (uint32_t) strtol(current_char, NULL, 16);
 
+		// use lookup table to find active-low value to represent number on the 7-segment display
 		uint32_t hex_value_to_write = hex_display_table[number];
+
 		alt_write_word(fpga_hex_displays[hex_display_index], hex_value_to_write);
 	}
 }
