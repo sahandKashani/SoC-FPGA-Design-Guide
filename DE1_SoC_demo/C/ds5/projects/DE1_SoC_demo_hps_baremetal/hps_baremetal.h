@@ -3,7 +3,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "hps.h"
+
+#include "socal/hps.h"
 #include "../hps_soc_system.h"
 
 // |=============|==========|==============|==========|
@@ -73,7 +74,7 @@ void setup_hex_displays();
 void setup_hps_gpio();
 void delay_us(uint32_t us);
 void set_hex_displays(uint32_t value);
-void toggle_hps_led(bool *hps_led_on);
+void toggle_hps_led();
 bool is_fpga_button_pressed(uint32_t button_number);
 
 #endif

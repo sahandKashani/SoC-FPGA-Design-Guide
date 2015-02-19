@@ -3,13 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "hps_baremetal.h"
-#include "../hps_soc_system.h"
-#include "hwlib.h"
 #include "alt_clock_manager.h"
 #include "alt_generalpurpose_io.h"
 #include "alt_globaltmr.h"
+#include "hps_baremetal.h"
+#include "hwlib.h"
+#include "socal/hps.h"
 #include "socal/socal.h"
+#include "../hps_soc_system.h"
 
 // State variables
 bool hex_increment = true;
@@ -74,20 +75,18 @@ void set_hex_displays(uint32_t value) {
 	}
 }
 
-void toggle_hps_led(bool *hps_led_on) {
+void toggle_hps_led() {
     uint32_t hps_gpio_input = alt_gpio_port_data_read(HPS_KEY_PORT, HPS_KEY_MASK);
 
-    bool toggle_hps_led = false;
-
     // HPS_KEY is active-low
-    if (~hps_gpio_input & HPS_KEY_MASK) {
-        *hps_led_on = !(*hps_led_on);
-    }
+    bool toggle_hps_led = (~hps_gpio_input & HPS_KEY_MASK);
 
-    if (*hps_led_on) {
-        assert(ALT_E_SUCCESS == alt_gpio_port_data_write(HPS_LED_PORT, HPS_LED_MASK, ALT_GPIO_PIN_DATAONE << HPS_LED_PORT_BIT));
-    } else {
-        assert(ALT_E_SUCCESS == alt_gpio_port_data_write(HPS_LED_PORT, HPS_LED_MASK, ALT_GPIO_PIN_DATAZERO << HPS_LED_PORT_BIT));
+    if (toggle_hps_led) {
+        uint32_t hps_led_value = alt_read_word(ALT_GPIO1_SWPORTA_DR_ADDR);
+        hps_led_value >>= HPS_LED_PORT_BIT;
+        hps_led_value = !hps_led_value;
+        hps_led_value <<= HPS_LED_PORT_BIT;
+        assert(ALT_E_SUCCESS == alt_gpio_port_data_write(HPS_LED_PORT, HPS_LED_MASK, HPS_LED_PORT_BIT));
     }
 }
 
@@ -101,7 +100,6 @@ int main() {
 	printf("DE1-SoC bare-metal demo\n");
 	setup_peripherals();
 
-	bool hps_led_on = false;
 	uint32_t hex_counter_uint = 0;
 
 	while (true) {
@@ -126,7 +124,7 @@ int main() {
 
 		set_hex_displays(hex_counter_uint);
 
-		toggle_hps_led(&hps_led_on);
+		toggle_hps_led();
 
 		delay_us(ALT_MICROSECS_IN_A_SEC / 10);
 	}
