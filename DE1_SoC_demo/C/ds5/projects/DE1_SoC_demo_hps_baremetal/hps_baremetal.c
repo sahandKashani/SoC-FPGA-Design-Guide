@@ -116,7 +116,7 @@ void handle_hex_displays(uint32_t *hex_counter) {
         *hex_counter = 0;
     }
 
-    // restrict hex_counter_uint to HEX_DISPLAY_COUNT digits
+    // restrict hex_counter to HEX_DISPLAY_COUNT digits
     *hex_counter &= HEX_COUNTER_MASK;
     set_hex_displays(*hex_counter);
 }
