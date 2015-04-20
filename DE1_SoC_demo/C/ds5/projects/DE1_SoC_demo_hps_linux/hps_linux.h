@@ -75,14 +75,19 @@ uint32_t hex_display_table[16] = {HEX_DISPLAY_ZERO , HEX_DISPLAY_ONE,
                                   HEX_DISPLAY_E    , HEX_DISPLAY_F};
 
 void open_physical_memory_device();
+void close_physical_memory_device();
 void mmap_hps_peripherals();
+void munmap_hps_peripherals();
 void mmap_fpga_peripherals();
-void setup_peripherals();
+void munmap_fpga_peripherals();
+void mmap_peripherals();
+void munmap_peripherals();
 void setup_hps_gpio();
 void setup_hex_displays();
 void set_hex_displays(uint32_t value);
 void handle_hps_led();
 bool is_fpga_button_pressed(uint32_t button_number);
 void handle_hex_displays(uint32_t *hex_counter);
+
 
 #endif

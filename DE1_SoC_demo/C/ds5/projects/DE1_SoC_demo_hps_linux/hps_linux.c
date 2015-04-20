@@ -35,6 +35,10 @@ void open_physical_memory_device() {
     }
 }
 
+void close_physical_memory_device() {
+    close(fd_dev_mem);
+}
+
 void mmap_hps_peripherals() {
     hps_gpio = mmap(NULL, hps_gpio_span, PROT_READ | PROT_WRITE, MAP_SHARED, fd_dev_mem, hps_gpio_ofst);
     if (hps_gpio == MAP_FAILED) {
@@ -43,6 +47,17 @@ void mmap_hps_peripherals() {
         close(fd_dev_mem);
         exit(EXIT_FAILURE);
     }
+}
+
+void munmap_hps_peripherals() {
+    if (munmap(hps_gpio, hps_gpio_span) != 0) {
+        printf("Error: hps_gpio munmap() failed\n");
+        printf("    errno = %s\n", strerror(errno));
+        close(fd_dev_mem);
+        exit(EXIT_FAILURE);
+    }
+
+    hps_gpio = NULL;
 }
 
 void mmap_fpga_peripherals() {
@@ -82,22 +97,41 @@ void mmap_fpga_peripherals() {
     fpga_hex_displays[5] = h2f_lw_axi_master + HEX_5_BASE;
 }
 
-void setup_peripherals() {
+void munmap_fpga_peripherals() {
+    if (munmap(h2f_lw_axi_master, h2f_lw_axi_master_span) != 0) {
+        printf("Error: h2f_lw_axi_master munmap() failed\n");
+        printf("    errno = %s\n", strerror(errno));
+        close(fd_dev_mem);
+        exit(EXIT_FAILURE);
+    }
+
+    h2f_lw_axi_master    = NULL;
+    fpga_buttons         = NULL;
+    fpga_hex_displays[0] = NULL;
+    fpga_hex_displays[1] = NULL;
+    fpga_hex_displays[2] = NULL;
+    fpga_hex_displays[3] = NULL;
+    fpga_hex_displays[4] = NULL;
+    fpga_hex_displays[5] = NULL;
+}
+
+void mmap_peripherals() {
     mmap_hps_peripherals();
     mmap_fpga_peripherals();
-    setup_hps_gpio();
-    setup_hex_displays();
+}
+
+void munmap_peripherals() {
+    munmap_hps_peripherals();
+    munmap_fpga_peripherals();
 }
 
 void setup_hps_gpio() {
-    uint32_t hps_gpio_config_len = 2;
-    ALT_GPIO_CONFIG_RECORD_t hps_gpio_config[] = {
-        {HPS_LED_IDX, ALT_GPIO_PIN_OUTPUT, 0, 0, ALT_GPIO_PIN_DEBOUNCE, ALT_GPIO_PIN_DATAZERO},
-        {HPS_KEY_IDX, ALT_GPIO_PIN_INPUT , 0, 0, ALT_GPIO_PIN_DEBOUNCE, ALT_GPIO_PIN_DATAZERO}
-    };
-
-    assert(ALT_E_SUCCESS == alt_gpio_init());
-    assert(ALT_E_SUCCESS == alt_gpio_group_config(hps_gpio_config, hps_gpio_config_len));
+    // Initialize the HPS PIO controller:
+    //     Set the direction of the HPS_LED GPIO1 bit to "output" - set to 1
+    //     Set the direction of the HPS_KEY GPIO1 bit to "input"  - set to 0
+    void *hps_gpio_direction = ALT_GPIO_SWPORTA_DDR_ADDR(hps_gpio);
+    alt_setbits_word(hps_gpio_direction, HPS_LED_MASK);
+    alt_clrbits_word(hps_gpio_direction, HPS_KEY_MASK);
 }
 
 void setup_hex_displays() {
@@ -173,7 +207,11 @@ void handle_hex_displays(uint32_t *hex_counter) {
 int main() {
 	printf("DE1-SoC linux demo\n");
 
-	setup_peripherals();
+	open_physical_memory_device();
+	mmap_peripherals();
+
+    setup_hps_gpio();
+    setup_hex_displays();
 
 	uint32_t hex_counter = 0;
 	while (true) {
@@ -181,6 +219,9 @@ int main() {
 		handle_hps_led();
 		usleep(ALT_MICROSECS_IN_A_SEC / 10);
 	}
+
+	munmap_peripherals();
+	close_physical_memory_device();
 
 	return 0;
 }
