@@ -127,11 +127,11 @@ void munmap_peripherals() {
 
 void setup_hps_gpio() {
     // Initialize the HPS PIO controller:
-    //     Set the direction of the HPS_LED GPIO1 bit to "output" - set to 1
-    //     Set the direction of the HPS_KEY GPIO1 bit to "input"  - set to 0
+    //     Set the direction of the HPS_LED GPIO1 bit to "output"
+    //     Set the direction of the HPS_KEY GPIO1 bit to "input"
     void *hps_gpio_direction = ALT_GPIO_SWPORTA_DDR_ADDR(hps_gpio);
-    alt_setbits_word(hps_gpio_direction, HPS_LED_MASK);
-    alt_clrbits_word(hps_gpio_direction, HPS_KEY_MASK);
+    alt_setbits_word(hps_gpio_direction, ALT_GPIO_PIN_OUTPUT << HPS_LED_PORT_BIT);
+    alt_setbits_word(hps_gpio_direction, ALT_GPIO_PIN_INPUT << HPS_KEY_PORT_BIT);
 }
 
 void setup_hex_displays() {
