@@ -3,7 +3,7 @@
 --
 -- BOARD         : DE1-SoC from Terasic
 -- Author        : Sahand Kashani-Akhavan from Terasic documentation
--- Revision      : 1.1
+-- Revision      : 1.2
 -- Creation date : 04/02/2015
 --
 -- Syntax Rule : GROUP_NAME_N[bit]
@@ -100,10 +100,10 @@ entity DE1_SoC_top_level is
         VGA_SYNC_N       : out   std_logic;
         VGA_VS           : out   std_logic;
 
-        -- GPIO_0, GPIO_0 connect to GPIO Default
+        -- GPIO_0
         GPIO_0           : inout std_logic_vector(35 downto 0);
 
-        -- GPIO_1, GPIO_1 connect to GPIO Default
+        -- GPIO_1
         GPIO_1           : inout std_logic_vector(35 downto 0);
 
         -- HPS
