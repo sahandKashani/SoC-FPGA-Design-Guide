@@ -1,19 +1,3 @@
--- #############################################################################
--- DE1_SoC_top_level.vhd
---
--- BOARD         : DE1-SoC from Terasic
--- Author        : Sahand Kashani-Akhavan from Terasic documentation
--- Revision      : 1.1
--- Creation date : 04/02/2015
---
--- Syntax Rule : GROUP_NAME_N[bit]
---
--- GROUP  : specify a particular interface (ex: SDR_)
--- NAME   : signal name (ex: CONFIG, D, ...)
--- bit    : signal index
--- _N     : to specify an active-low signal
--- #############################################################################
-
 library ieee;
 use ieee.std_logic_1164.all;
 

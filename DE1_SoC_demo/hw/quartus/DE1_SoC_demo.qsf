@@ -1,18 +1,18 @@
 # -------------------------------------------------------------------------- #
 #
 # Copyright (C) 1991-2014 Altera Corporation. All rights reserved.
-# Your use of Altera Corporation's design tools, logic functions 
-# and other software and tools, and its AMPP partner logic 
-# functions, and any output files from any of the foregoing 
-# (including device programming or simulation files), and any 
-# associated documentation or information are expressly subject 
-# to the terms and conditions of the Altera Program License 
+# Your use of Altera Corporation's design tools, logic functions
+# and other software and tools, and its AMPP partner logic
+# functions, and any output files from any of the foregoing
+# (including device programming or simulation files), and any
+# associated documentation or information are expressly subject
+# to the terms and conditions of the Altera Program License
 # Subscription Agreement, the Altera Quartus II License Agreement,
-# the Altera MegaCore Function License Agreement, or other 
-# applicable license agreement, including, without limitation, 
-# that your use is for the sole purpose of programming logic 
-# devices manufactured by Altera and sold by Altera or its 
-# authorized distributors.  Please refer to the applicable 
+# the Altera MegaCore Function License Agreement, or other
+# applicable license agreement, including, without limitation,
+# that your use is for the sole purpose of programming logic
+# devices manufactured by Altera and sold by Altera or its
+# authorized distributors.  Please refer to the applicable
 # agreement for further details.
 #
 # -------------------------------------------------------------------------- #
@@ -586,7 +586,7 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[34]
 set_location_assignment PIN_AC22 -to GPIO_1[35]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[35]
 set_global_assignment -name QIP_FILE soc_system/synthesis/soc_system.qip
-set_global_assignment -name VHDL_FILE ../vhdl/DE1_SoC_top_level.vhd
+set_global_assignment -name VHDL_FILE ../hdl/DE1_SoC_top_level.vhd
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
