@@ -854,7 +854,7 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_I2C1_SDAT
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_I2C2_SCLK
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_I2C2_SDAT
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_I2C_CONTROL
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_KEY
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_KEY_N
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_LED
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_SD_CLK
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_SD_CMD
