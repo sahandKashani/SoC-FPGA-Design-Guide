@@ -3,7 +3,7 @@
 --
 -- BOARD         : DE1-SoC from Terasic
 -- Author        : Sahand Kashani-Akhavan from Terasic documentation
--- Revision      : 1.2
+-- Revision      : 1.3
 -- Creation date : 04/02/2015
 --
 -- Syntax Rule : GROUP_NAME_N[bit]
@@ -68,7 +68,7 @@ entity DE1_SoC_top_level is
         IRDA_RXD         : in    std_logic;
         IRDA_TXD         : out   std_logic;
 
-        -- KEY_n
+        -- KEY_N
         KEY_N            : in    std_logic_vector(3 downto 0);
 
         -- LED
@@ -143,7 +143,7 @@ entity DE1_SoC_top_level is
         HPS_I2C1_SDAT    : inout std_logic;
         HPS_I2C2_SCLK    : inout std_logic;
         HPS_I2C2_SDAT    : inout std_logic;
-        HPS_KEY          : inout std_logic;
+        HPS_KEY_N        : inout std_logic;
         HPS_LED          : inout std_logic;
         HPS_SD_CLK       : out   std_logic;
         HPS_SD_CMD       : inout std_logic;
