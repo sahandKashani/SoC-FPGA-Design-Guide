@@ -19,23 +19,27 @@
 * this list of conditions and the following disclaimer in the documentation
 * and/or other materials provided with the distribution.
 *
-* 3. The name of the author may not be used to endorse or promote products
-* derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER "AS IS" AND ANY EXPRESS OR
-* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED. IN NO
-* EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-* OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* 3. Neither the name of the copyright holder nor the names of its contributors
+* may be used to endorse or promote products derived from this software without
+* specific prior written permission.
+* 
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-* IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
-* OF SUCH DAMAGE.
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
 *
 ******************************************************************************/
 
-
+/*
+ * $Id: //acds/rel/15.1/embedded/ip/hps/altera_hps/hwlib/src/hwmgr/alt_globaltmr.c#1 $
+ */
 
 #include    <stdlib.h>
 #include    <stdint.h>
@@ -45,9 +49,12 @@
 #include    "hwlib.h"
 #include    "alt_mpu_registers.h"
 #include    "alt_globaltmr.h"
-#include    "alt_clock_manager.h"                    // for getting clock bus frequency
+#include    "alt_clock_manager.h"                    /* for getting clock bus frequency */
 
 
+#ifdef soc_a10
+#define ALT_MPUSCU_OFST                         ALT_MPU_REGS_MPUSCU_OFST
+#endif
 
 /************************************************************************************************************/
 
@@ -84,7 +91,7 @@ ALT_STATUS_CODE alt_globaltmr_uninit(void)
     alt_clrbits_word(GLOBALTMR_BASE + GLOBALTMR_CTRL_REG_OFFSET,
                 GLOBALTMR_COMP_ENABLE_BIT | GLOBALTMR_INT_ENABLE_BIT |
                 GLOBALTMR_AUTOINC_ENABLE_BIT);
-            // do NOT clear the global timer enable bit or prescaler setting
+            /* do NOT clear the global timer enable bit or prescaler setting */
     alt_write_word(GLOBALTMR_BASE + GLOBALTMR_COMP_LO_REG_OFFSET, 0);
     alt_write_word(GLOBALTMR_BASE + GLOBALTMR_COMP_HI_REG_OFFSET, 0);
     alt_write_word(GLOBALTMR_BASE + GLOBALTMR_AUTOINC_REG_OFFSET, 0);
@@ -114,7 +121,7 @@ ALT_STATUS_CODE alt_globaltmr_init(void)
 
 ALT_STATUS_CODE alt_globaltmr_stop(void)
 {
-    uint32_t        regdata;                // value to read & write
+    uint32_t        regdata;                /* value to read & write */
 
     regdata = alt_read_word(GLOBALTMR_BASE + GLOBALTMR_CTRL_REG_OFFSET);
     alt_write_word(GLOBALTMR_BASE + GLOBALTMR_CTRL_REG_OFFSET, regdata & ~GLOBALTMR_COMP_ENABLE_BIT);
@@ -129,7 +136,7 @@ ALT_STATUS_CODE alt_globaltmr_stop(void)
 
 ALT_STATUS_CODE alt_globaltmr_start(void)
 {
-    uint32_t        regdata;                // value to read & write
+    uint32_t        regdata;                /* value to read & write */
 
     regdata = alt_read_word(GLOBALTMR_BASE + GLOBALTMR_CTRL_REG_OFFSET);
     alt_write_word(GLOBALTMR_BASE + GLOBALTMR_CTRL_REG_OFFSET, regdata | (GLOBALTMR_COMP_ENABLE_BIT | GLOBALTMR_ENABLE_BIT));
@@ -144,8 +151,8 @@ ALT_STATUS_CODE alt_globaltmr_start(void)
 ALT_STATUS_CODE alt_globaltmr_get(uint32_t* highword, uint32_t* loword)
 {
     ALT_STATUS_CODE     ret = ALT_E_ERROR;
-    uint32_t            hi, lo, temp;                   // temporary variables
-    uint32_t            cnt = 3;                        // Timeout counter, do 3 tries
+    uint32_t            hi, lo, temp;                   /* temporary variables */
+    uint32_t            cnt = 3;                        /* Timeout counter, do 3 tries */
 
     if ((highword == NULL) || (loword == NULL)) { ret = ALT_E_BAD_ARG; }
     else
@@ -155,8 +162,8 @@ ALT_STATUS_CODE alt_globaltmr_get(uint32_t* highword, uint32_t* loword)
             temp = hi;
             lo = alt_read_word(GLOBALTMR_BASE + GLOBALTMR_CNTR_LO_REG_OFFSET);
             hi = alt_read_word(GLOBALTMR_BASE + GLOBALTMR_CNTR_HI_REG_OFFSET);
-        }  while ((temp != hi) && (cnt--));             // has the high-order word read the same twice yet?
-                       // note that if the first condition is true, cnt is neither tested nor decremented
+        }  while ((temp != hi) && (cnt--));             /* has the high-order word read the same twice yet? */
+                       /* note that if the first condition is true, cnt is neither tested nor decremented */
 
         if (cnt) {
             *highword = hi;
@@ -175,17 +182,17 @@ ALT_STATUS_CODE alt_globaltmr_get(uint32_t* highword, uint32_t* loword)
 uint64_t  alt_globaltmr_get64(void)
 {
 
-    uint64_t        ret = 0;                    // zero a very unlikely value for this timer
-    uint32_t        hi, lo, temp;               // temporary variables
-    uint32_t        cnt = 3;                    // Timeout counter, do 3 tries
+    uint64_t        ret = 0;                    /* zero a very unlikely value for this timer */
+    uint32_t        hi, lo, temp;               /* temporary variables */
+    uint32_t        cnt = 3;                    /* Timeout counter, do 3 tries */
 
     hi = alt_read_word(GLOBALTMR_BASE + GLOBALTMR_CNTR_HI_REG_OFFSET);
     do {
         temp = hi;
         lo = alt_read_word(GLOBALTMR_BASE + GLOBALTMR_CNTR_LO_REG_OFFSET);
         hi = alt_read_word(GLOBALTMR_BASE + GLOBALTMR_CNTR_HI_REG_OFFSET);
-    }  while ((temp != hi) && (cnt--));             // has the high-order word read the same twice yet?
-                        // note that if the first condition is true, cnt is neither tested nor decremented
+    }  while ((temp != hi) && (cnt--));             /* has the high-order word read the same twice yet? */
+                        /* note that if the first condition is true, cnt is neither tested nor decremented */
 
     if (cnt)
     {
@@ -226,7 +233,7 @@ ALT_STATUS_CODE alt_globaltmr_comp_set(uint32_t highword, uint32_t loword)
     bool                was_comping = false;
     ALT_STATUS_CODE     ret = ALT_E_ERROR;
 
-    if (alt_globaltmr_is_comp_mode())                   // necessary to prevent a spurious interrupt
+    if (alt_globaltmr_is_comp_mode())                   /* necessary to prevent a spurious interrupt */
     {
         was_comping = true;
         ret = alt_globaltmr_comp_mode_stop();
@@ -237,7 +244,7 @@ ALT_STATUS_CODE alt_globaltmr_comp_set(uint32_t highword, uint32_t loword)
     ret = ALT_E_SUCCESS;
 
     if (was_comping)  { ret = alt_globaltmr_comp_mode_start(); }
-                // If global timer was in comparison mode before, re-enable it before returning
+                /* If global timer was in comparison mode before, re-enable it before returning */
     return    ret;
 }
 
@@ -264,7 +271,7 @@ ALT_STATUS_CODE alt_globaltmr_comp_set64(uint64_t compval)
     ret = ALT_E_SUCCESS;
 
     if (was_comping)  { ret = alt_globaltmr_comp_mode_start(); }
-                                // If global timer was in comparison mode before, re-enable it
+                                /* If global timer was in comparison mode before, re-enable it */
     return    ret;
 }
 
@@ -380,8 +387,8 @@ uint32_t alt_globaltmr_prescaler_get(void)
 
 ALT_STATUS_CODE alt_globaltmr_prescaler_set(uint32_t val)
 {
-    // It is not defined in the ARM global timer spec if the prescaler can be rewritten while
-    //the global timer is counting or not. This is how we find out:
+    /* It is not defined in the ARM global timer spec if the prescaler can be rewritten while
+     *the global timer is counting or not. This is how we find out: */
     uint32_t        regdata;
 
     if (val > UINT8_MAX) return ALT_E_BAD_ARG;
@@ -404,7 +411,7 @@ ALT_STATUS_CODE alt_globaltmr_autoinc_set(uint32_t inc)
     {
         was_comping = true;
         ret = alt_globaltmr_comp_mode_stop();
-                            // if timer is currently in comparison mode, disable comparison mode
+                            /* if timer is currently in comparison mode, disable comparison mode */
         if (ret != ALT_E_SUCCESS)   { return ret; }
     }
 
@@ -412,7 +419,7 @@ ALT_STATUS_CODE alt_globaltmr_autoinc_set(uint32_t inc)
     ret = ALT_E_SUCCESS;
 
     if (was_comping)  { ret = alt_globaltmr_comp_mode_start(); }
-                      // If global timer was in comparison mode before, re-enable it
+                      /* If global timer was in comparison mode before, re-enable it */
     return    ret;
 }
 
@@ -494,7 +501,7 @@ ALT_STATUS_CODE alt_globaltmr_int_disable(void)
 
 ALT_STATUS_CODE alt_globaltmr_int_enable(void)
 {
-    if (!alt_globaltmr_is_running())                        // Is gbl timer running?
+    if (!alt_globaltmr_is_running())                        /* Is gbl timer running? */
     {
         if ( alt_globaltmr_start() != ALT_E_SUCCESS)   { return ALT_E_ERROR; }
     }
@@ -550,7 +557,7 @@ bool alt_globaltmr_int_if_pending_clear(void)
     if (ret)
     {
         alt_write_word(GLOBALTMR_BASE + GLOBALTMR_INT_STAT_REG_OFFSET, GLOBALTMR_INT_STATUS_BIT);
-    }          //clear int by writing to sticky bit
+    }          /*clear int by writing to sticky bit */
 
     return  ret;
 }
