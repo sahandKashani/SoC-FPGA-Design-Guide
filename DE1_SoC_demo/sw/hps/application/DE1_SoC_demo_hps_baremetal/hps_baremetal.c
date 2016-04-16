@@ -29,8 +29,8 @@ void setup_hps_timer() {
 void setup_hps_gpio() {
     uint32_t hps_gpio_config_len = 2;
     ALT_GPIO_CONFIG_RECORD_t hps_gpio_config[] = {
-        {HPS_LED_IDX, ALT_GPIO_PIN_OUTPUT, 0, 0, ALT_GPIO_PIN_DEBOUNCE, ALT_GPIO_PIN_DATAZERO},
-        {HPS_KEY_IDX, ALT_GPIO_PIN_INPUT , 0, 0, ALT_GPIO_PIN_DEBOUNCE, ALT_GPIO_PIN_DATAZERO}
+        {HPS_LED_IDX  , ALT_GPIO_PIN_OUTPUT, 0, 0, ALT_GPIO_PIN_DEBOUNCE, ALT_GPIO_PIN_DATAZERO},
+        {HPS_KEY_N_IDX, ALT_GPIO_PIN_INPUT , 0, 0, ALT_GPIO_PIN_DEBOUNCE, ALT_GPIO_PIN_DATAZERO}
     };
 
     assert(ALT_E_SUCCESS == alt_gpio_init());
@@ -42,8 +42,7 @@ void setup_hex_displays() {
 }
 
 /* The HPS doesn't have a sleep() function like the Nios II, so we can make one
- * by using the global timer.
- */
+ * by using the global timer. */
 void delay_us(uint32_t us) {
     uint64_t start_time = alt_globaltmr_get64();
     uint32_t timer_prescaler = alt_globaltmr_prescaler_get() + 1;
@@ -53,9 +52,8 @@ void delay_us(uint32_t us) {
     assert(ALT_E_SUCCESS == alt_clk_freq_get(ALT_CLK_MPU_PERIPH, &timer_clock));
     end_time = start_time + us * ((timer_clock / timer_prescaler) / ALT_MICROSECS_IN_A_SEC);
 
-    while(alt_globaltmr_get64() < end_time) {
-        // polling wait
-    }
+    // polling wait
+    while(alt_globaltmr_get64() < end_time);
 }
 
 void set_hex_displays(uint32_t value) {
@@ -80,10 +78,10 @@ void set_hex_displays(uint32_t value) {
 }
 
 void handle_hps_led() {
-    uint32_t hps_gpio_input = alt_gpio_port_data_read(HPS_KEY_PORT, HPS_KEY_MASK);
+    uint32_t hps_gpio_input = alt_gpio_port_data_read(HPS_KEY_N_PORT, HPS_KEY_N_MASK);
 
-    // HPS_KEY is active-low
-    bool toggle_hps_led = (~hps_gpio_input & HPS_KEY_MASK);
+    // HPS_KEY_N is active-low
+    bool toggle_hps_led = (~hps_gpio_input & HPS_KEY_N_MASK);
 
     if (toggle_hps_led) {
         uint32_t hps_led_value = alt_read_word(ALT_GPIO1_SWPORTA_DR_ADDR);

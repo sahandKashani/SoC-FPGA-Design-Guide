@@ -128,10 +128,10 @@ void munmap_peripherals() {
 void setup_hps_gpio() {
     // Initialize the HPS PIO controller:
     //     Set the direction of the HPS_LED GPIO bit to "output"
-    //     Set the direction of the HPS_KEY GPIO bit to "input"
+    //     Set the direction of the HPS_KEY_N GPIO bit to "input"
     void *hps_gpio_direction = ALT_GPIO_SWPORTA_DDR_ADDR(hps_gpio);
     alt_setbits_word(hps_gpio_direction, ALT_GPIO_PIN_OUTPUT << HPS_LED_PORT_BIT);
-    alt_setbits_word(hps_gpio_direction, ALT_GPIO_PIN_INPUT << HPS_KEY_PORT_BIT);
+    alt_setbits_word(hps_gpio_direction, ALT_GPIO_PIN_INPUT << HPS_KEY_N_PORT_BIT);
 }
 
 void setup_hex_displays() {
@@ -163,10 +163,10 @@ void handle_hps_led() {
     void *hps_gpio_data = ALT_GPIO_SWPORTA_DR_ADDR(hps_gpio);
     void *hps_gpio_port = ALT_GPIO_EXT_PORTA_ADDR(hps_gpio);
 
-    uint32_t hps_gpio_input = alt_read_word(hps_gpio_port) & HPS_KEY_MASK;
+    uint32_t hps_gpio_input = alt_read_word(hps_gpio_port) & HPS_KEY_N_MASK;
 
-    // HPS_KEY is active-low
-    bool toggle_hps_led = (~hps_gpio_input & HPS_KEY_MASK);
+    // HPS_KEY_N is active-low
+    bool toggle_hps_led = (~hps_gpio_input & HPS_KEY_N_MASK);
 
     if (toggle_hps_led) {
         uint32_t hps_led_value = alt_read_word(hps_gpio_data);

@@ -12,20 +12,20 @@
 // |=============|==========|==============|==========|
 // |   HPS_LED   |  GPIO53  |   GPIO1[24]  |    I/O   |
 // |=============|==========|==============|==========|
-#define HPS_LED_IDX      (ALT_GPIO_1BIT_53)                      // GPIO53
-#define HPS_LED_PORT     (alt_gpio_bit_to_pid(HPS_LED_IDX))      // ALT_GPIO_PORTB
-#define HPS_LED_PORT_BIT (alt_gpio_bit_to_port_pin(HPS_LED_IDX)) // 24 (from GPIO1[24])
-#define HPS_LED_MASK     (1 << HPS_LED_PORT_BIT)
+#define HPS_LED_IDX        (ALT_GPIO_1BIT_53)                      // GPIO53
+#define HPS_LED_PORT       (alt_gpio_bit_to_pid(HPS_LED_IDX))      // ALT_GPIO_PORTB
+#define HPS_LED_PORT_BIT   (alt_gpio_bit_to_port_pin(HPS_LED_IDX)) // 24 (from GPIO1[24])
+#define HPS_LED_MASK       (1 << HPS_LED_PORT_BIT)
 
 // |=============|==========|==============|==========|
 // | Signal Name | HPS GPIO | Register/bit | Function |
 // |=============|==========|==============|==========|
-// |   HPS_KEY   |  GPIO54  |   GPIO1[25]  |    I/O   |
+// |  HPS_KEY_N  |  GPIO54  |   GPIO1[25]  |    I/O   |
 // |=============|==========|==============|==========|
-#define HPS_KEY_IDX      (ALT_GPIO_1BIT_54)                      // GPIO54
-#define HPS_KEY_PORT     (alt_gpio_bit_to_pid(HPS_KEY_IDX))      // ALT_GPIO_PORTB
-#define HPS_KEY_PORT_BIT (alt_gpio_bit_to_port_pin(HPS_KEY_IDX)) // 25 (from GPIO1[25])
-#define HPS_KEY_MASK     (1 << HPS_KEY_PORT_BIT)
+#define HPS_KEY_N_IDX      (ALT_GPIO_1BIT_54)                        // GPIO54
+#define HPS_KEY_N_PORT     (alt_gpio_bit_to_pid(HPS_KEY_N_IDX))      // ALT_GPIO_PORTB
+#define HPS_KEY_N_PORT_BIT (alt_gpio_bit_to_port_pin(HPS_KEY_N_IDX)) // 25 (from GPIO1[25])
+#define HPS_KEY_N_MASK     (1 << HPS_KEY_N_PORT_BIT)
 
 // The 7-segment display is active low
 #define HEX_DISPLAY_CLEAR (0x7F)

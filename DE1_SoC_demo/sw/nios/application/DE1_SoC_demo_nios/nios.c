@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <unistd.h>
 #include "io.h"
 #include "altera_avalon_pio_regs.h"
@@ -15,8 +16,8 @@ void rotate_leds() {
     int led_direction = 0;
 
     while (loop_count < LEDS_MAX_ITERATION) {
-        alt_u32 switches_value = IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_0_BASE);
-        alt_u32 leds_value = ~leds_mask;
+        uint32_t switches_value = IORD_ALTERA_AVALON_PIO_DATA(SWITCHES_0_BASE);
+        uint32_t leds_value = ~leds_mask;
 
         // only turn on leds which have their corresponding switch enabled
         IOWR_ALTERA_AVALON_PIO_DATA(LEDS_0_BASE, leds_value & switches_value);
