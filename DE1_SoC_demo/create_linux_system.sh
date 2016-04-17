@@ -27,7 +27,7 @@ uboot_img_file="$(readlink -m "${uboot_src_dir}/u-boot.img")"
 linux_dir="$(readlink -m "sw/hps/linux")"
 linux_src_git_repo="git@github.com:torvalds/linux.git"
 linux_src_dir="$(readlink -m "${linux_dir}/source")"
-linux_kernel_mem_arg="768M"
+linux_kernel_mem_arg="1024M"
 linux_zImage_file="$(readlink -m "${linux_src_dir}/arch/arm/boot/zImage")"
 linux_dtb_file="$(readlink -m "${linux_src_dir}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dtb")"
 
@@ -474,10 +474,10 @@ if [ ! -d "${sdcard_fat32_dir}" ]; then
     mkdir -p "${sdcard_fat32_dir}"
 fi
 
-# compile_quartus_project
-# compile_preloader
-# compile_uboot
-# compile_linux
+compile_quartus_project
+compile_preloader
+compile_uboot
+compile_linux
 create_rootfs
 
 if [ ! -b "${sdcard_dev}" ]; then
@@ -486,7 +486,7 @@ if [ ! -b "${sdcard_dev}" ]; then
     exit 1
 fi
 
-# partition_sdcard
-# write_sdcard
+partition_sdcard
+write_sdcard
 
 # Make sure MSEL = 000000
