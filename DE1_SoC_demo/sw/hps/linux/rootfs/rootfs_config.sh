@@ -15,12 +15,6 @@ cat <<EOF > /etc/hosts
 127.0.1.1   DE1-SoC
 EOF
 
-# apt sources
-# uncomment the "deb" lines (no need to uncomment "deb src" lines)
-perl -pi -e 's/^#+\s+(deb\s+http)/$1/g' /etc/apt/sources.list
-
-# fstab (boot partition, swap partition)
-
 # network interfaces
 cat <<EOF > /etc/network/interfaces
 # interfaces(5) file used by ifup(8) and ifdown(8)
@@ -48,8 +42,15 @@ stop on runlevel [016]
 respawn
 
 exec /sbin/getty -L 115200 ttyS0 vt102
-# exec /sbin/getty -l /usr/bin/autologin -n 115200 ttyS0
 EOF
+
+# apt sources
+# uncomment the "deb" lines (no need to uncomment "deb src" lines)
+perl -pi -e 's/^#+\s+(deb\s+http)/$1/g' /etc/apt/sources.list
+
+# install software packages required
+apt-get update
+apt-get -y install ssh gdbserver
 
 # create user "sahand" with password "1234"
 username="sahand"
@@ -61,3 +62,7 @@ useradd -m -p "${encrypted_password}" -s /bin/bash "${username}"
 # ubuntu requires the admin to be part of the "adm" and "sudo" groups
 addgroup ${username} adm
 addgroup ${username} sudo
+
+# set root password to "1234" (needed so we have a password to supply ARM DS-5
+# when remote debugging)
+echo -e "${password}\n${password}\n" | passwd root

@@ -375,9 +375,9 @@ create_rootfs() {
     sudo rm "${rootfs_chroot_dir}/$(basename "${rootfs_config_script_file}")"
 
     # unmount host directories temporarily used for chroot
-    sudo umount "${rootfs_chroot_dir}/dev"
-    sudo umount "${rootfs_chroot_dir}/sys"
     sudo umount "${rootfs_chroot_dir}/proc"
+    sudo umount "${rootfs_chroot_dir}/sys"
+    sudo umount "${rootfs_chroot_dir}/dev"
 
     # create archive of updated rootfs
     pushd "${rootfs_chroot_dir}"
