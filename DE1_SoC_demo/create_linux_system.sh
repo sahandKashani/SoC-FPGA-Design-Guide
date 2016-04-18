@@ -29,7 +29,7 @@ linux_src_git_repo="git@github.com:torvalds/linux.git"
 linux_src_dir="$(readlink -m "${linux_dir}/source")"
 linux_kernel_mem_arg="1024M"
 linux_zImage_file="$(readlink -m "${linux_src_dir}/arch/arm/boot/zImage")"
-linux_dtb_file="$(readlink -m "${linux_src_dir}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dtb")"
+linux_dtb_file="$(readlink -m "${linux_src_dir}/arch/arm/boot/dts/socfpga_cyclone5_socdk.dtb")"
 
 rootfs_dir="${linux_dir}/rootfs"
 rootfs_chroot_dir="$(readlink -m ${rootfs_dir}/ubuntu-core-rootfs)"
@@ -317,7 +317,7 @@ compile_linux() {
     make -j2 zImage
 
     # compile device tree
-    make -j2 socfpga_cyclone5_de0_sockit.dtb
+    make -j2 "$(basename "${linux_dtb_file}")"
 
     # copy artifacts to associated sdcard directory
     cp "${linux_zImage_file}" "${sdcard_fat32_zImage_file}"
