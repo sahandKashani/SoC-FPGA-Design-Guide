@@ -72,7 +72,7 @@ sdcard_dev_ext3_mount_point="/tmp/${$}-ext3" # prepend PID for uniqueness
 usage() {
     cat <<EOF
 ===================================================================================
-usage: compile.sh [sdcard_device]
+usage: create_linux_system.sh [sdcard_device]
 
 positional arguments:
     sdcard_device    path to sdcard device file    [ex: "/dev/sdb", "/dev/mmcblk0"]
