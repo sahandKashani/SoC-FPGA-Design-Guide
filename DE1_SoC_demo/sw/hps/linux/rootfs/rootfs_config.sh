@@ -66,3 +66,7 @@ addgroup ${username} sudo
 # set root password to "1234" (needed so we have a password to supply ARM DS-5
 # when remote debugging)
 echo -e "${password}\n${password}\n" | passwd root
+
+# allow root SSH login with password (needed so we can use ARM DS-5 for remote
+# debugging)
+perl -pi -e 's/^(PermitRootLogin) without-password$/$1 yes/g' /etc/ssh/sshd_config
