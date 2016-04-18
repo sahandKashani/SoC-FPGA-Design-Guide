@@ -196,7 +196,7 @@ compile_preloader() {
     --settings "${preloader_settings_file}"
 
     # compile preloader
-    make -j4
+    make -j2
 
     # copy artifacts to associated sdcard directory
     cp "${preloader_bin_file}" "${sdcard_a2_preloader_bin_file}"
@@ -238,7 +238,7 @@ compile_uboot() {
     make socfpga_cyclone5_config
 
     # compile uboot
-    make -j4
+    make -j2
 
     # create uboot script
     cat <<EOF > "${uboot_script_file}"
@@ -314,10 +314,10 @@ compile_linux() {
     make socfpga_defconfig
 
     # compile zImage
-    make -j4 zImage
+    make -j2 zImage
 
     # compile device tree
-    make -j4 socfpga_cyclone5_de0_sockit.dtb
+    make -j2 socfpga_cyclone5_de0_sockit.dtb
 
     # copy artifacts to associated sdcard directory
     cp "${linux_zImage_file}" "${sdcard_fat32_zImage_file}"
