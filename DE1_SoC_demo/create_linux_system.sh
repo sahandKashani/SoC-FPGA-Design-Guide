@@ -25,7 +25,7 @@ uboot_script_file="$(readlink -m "${uboot_src_dir}/u-boot.script")"
 uboot_img_file="$(readlink -m "${uboot_src_dir}/u-boot.img")"
 
 linux_dir="$(readlink -m "sw/hps/linux")"
-linux_src_git_repo="git@github.com:torvalds/linux.git"
+linux_src_git_repo="https://github.com/torvalds/linux.git"
 linux_src_dir="$(readlink -m "${linux_dir}/source")"
 linux_kernel_mem_arg="1024M"
 linux_zImage_file="$(readlink -m "${linux_src_dir}/arch/arm/boot/zImage")"
@@ -34,7 +34,7 @@ linux_dtb_file="$(readlink -m "${linux_src_dir}/arch/arm/boot/dts/socfpga_cyclon
 rootfs_dir="${linux_dir}/rootfs"
 rootfs_chroot_dir="$(readlink -m ${rootfs_dir}/ubuntu-core-rootfs)"
 rootfs_src_tgz_link="http://cdimage.ubuntu.com/ubuntu-core/releases/14.04/release/ubuntu-core-14.04.4-core-armhf.tar.gz"
-rootfs_src_tgz_file="$(readlink -m "${rootfs_dir}/ubuntu-core-14.04.4-core-armhf.tar.gz")"
+rootfs_src_tgz_file="$(readlink -m "${rootfs_dir}/${rootfs_src_tgz_link##*/}")"
 rootfs_config_script_file="${rootfs_dir}/rootfs_config.sh"
 
 sdcard_fat32_dir="$(readlink -m "sdcard/fat32")"
@@ -65,8 +65,8 @@ fi
 sdcard_dev_fat32="${sdcard_dev}${sdcard_dev_fat32_id}"
 sdcard_dev_ext3="${sdcard_dev}${sdcard_dev_ext3_id}"
 sdcard_dev_a2="${sdcard_dev}${sdcard_dev_a2_id}"
-sdcard_dev_fat32_mount_point="/tmp/${$}-fat32" # prepend PID for uniqueness
-sdcard_dev_ext3_mount_point="/tmp/${$}-ext3" # prepend PID for uniqueness
+sdcard_dev_fat32_mount_point="$(readlink -m "sdcard/mount_point_fat32")"
+sdcard_dev_ext3_mount_point="$(readlink -m "sdcard/mount_point_ext3")"
 
 # usage() ######################################################################
 usage() {
@@ -403,29 +403,14 @@ partition_sdcard() {
         # but the a2 partition must be 1M.
 
     # automatically partitioning the sdcard
-    # if scard does not have suitable partitions, then partition the device
-    fdisk_output="$(sudo fdisk -l "${sdcard_dev}")"
-    if [ "$(echo "${fdisk_output}" | grep -i -P "${sdcard_dev_fat32}.+b\s+W95 FAT32.*" | wc -l)" -eq 0 ] ||
-       [ "$(echo "${fdisk_output}" | grep -i -P "${sdcard_dev_ext3}.+83\s+Linux.*" | wc -l)" -eq 0 ] ||
-       [ "$(echo "${fdisk_output}" | grep -i -P "${sdcard_dev_a2}.+a2\s+Unknown.*" | wc -l)" -eq 0 ]; then
-       cat <<EOF
-Did not find required device ids on device ${sdcard_dev}:
-    Required:    Device    Id       System
-              ${sdcard_dev_fat32}     b    W95 FAT32
-              ${sdcard_dev_ext3}    83        Linux
-              ${sdcard_dev_a2}    a2      Unknown
+    # wipe partition table
+    sudo dd if="/dev/zero" of="${sdcard_dev}" bs=512 count=1
 
-Formatting sdcard ...
-EOF
-        # wipe partition table
-        sudo dd if="/dev/zero" of="${sdcard_dev}" bs=512 count=1
-
-        # create partitions
-        # no need to specify the partition number for the first invocation of
-        # the "t" command in fdisk, because there is only 1 partition at this
-        # point
-        echo -e "n\np\n3\n\n4095\nt\na2\nn\np\n1\n\n+${sdcard_partition_size_fat32}\nt\n1\nb\nn\np\n2\n\n+${sdcard_partition_size_linux}\nt\n2\n83\nw\nq\n" | sudo fdisk "${sdcard_dev}"
-    fi
+    # create partitions
+    # no need to specify the partition number for the first invocation of
+    # the "t" command in fdisk, because there is only 1 partition at this
+    # point
+    echo -e "n\np\n3\n\n4095\nt\na2\nn\np\n1\n\n+${sdcard_partition_size_fat32}\nt\n1\nb\nn\np\n2\n\n+${sdcard_partition_size_linux}\nt\n2\n83\nw\nq\n" | sudo fdisk "${sdcard_dev}"
 
     # create filesystems
     sudo mkfs.vfat "${sdcard_dev_fat32}"
@@ -434,9 +419,9 @@ EOF
 
 # write_sdcard() ###############################################################
 write_sdcard() {
-    # create mount point for sdcard in /tmp
-    sudo mkdir -p "${sdcard_dev_fat32_mount_point}"
-    sudo mkdir -p "${sdcard_dev_ext3_mount_point}"
+    # create mount point for sdcard
+    mkdir -p "${sdcard_dev_fat32_mount_point}"
+    mkdir -p "${sdcard_dev_ext3_mount_point}"
 
     # mount sdcard partitions
     sudo mount "${sdcard_dev_fat32}" "${sdcard_dev_fat32_mount_point}"
@@ -460,9 +445,9 @@ write_sdcard() {
     sudo umount "${sdcard_dev_fat32_mount_point}"
     sudo umount "${sdcard_dev_ext3_mount_point}"
 
-    # delete mount points (were created in /tmp, so we can safely delete them
-    sudo rm -rf "${sdcard_dev_fat32_mount_point}"
-    sudo rm -rf "${sdcard_dev_ext3_mount_point}"
+    # delete mount points for sdcard
+    rm -rf "${sdcard_dev_fat32_mount_point}"
+    rm -rf "${sdcard_dev_ext3_mount_point}"
 }
 
 # Script execution #############################################################
