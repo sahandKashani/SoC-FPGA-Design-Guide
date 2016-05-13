@@ -34,7 +34,7 @@ linux_dtb_file="$(readlink -m "${linux_src_dir}/arch/arm/boot/dts/socfpga_cyclon
 rootfs_dir="${linux_dir}/rootfs"
 rootfs_chroot_dir="$(readlink -m ${rootfs_dir}/ubuntu-core-rootfs)"
 rootfs_src_tgz_link="http://cdimage.ubuntu.com/ubuntu-core/releases/14.04/release/ubuntu-core-14.04.4-core-armhf.tar.gz"
-rootfs_src_tgz_file="$(readlink -m "${rootfs_dir}/${rootfs_src_tgz_link##*/}")"
+rootfs_src_tgz_file="$(readlink -m "${rootfs_dir}/ubuntu-core-14.04.4-core-armhf.tar.gz")"
 rootfs_config_script_file="${rootfs_dir}/rootfs_config.sh"
 
 sdcard_fat32_dir="$(readlink -m "sdcard/fat32")"
@@ -329,11 +329,6 @@ compile_linux() {
 
 # create_rootfs() ##############################################################
 create_rootfs() {
-    # if rootfs tarball doesn't exist, then download it
-    if [ ! -f "${rootfs_src_tgz_file}" ]; then
-        wget "${rootfs_src_tgz_link}" -O "${rootfs_src_tgz_file}"
-    fi
-
     # delete old artifacts
     sudo rm -rf "${rootfs_chroot_dir}" \
                 "${sdcard_ext3_rootfs_tgz_file}"
