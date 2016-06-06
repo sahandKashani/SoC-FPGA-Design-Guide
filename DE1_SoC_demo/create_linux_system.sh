@@ -25,7 +25,7 @@ uboot_script_file="$(readlink -m "${uboot_src_dir}/u-boot.script")"
 uboot_img_file="$(readlink -m "${uboot_src_dir}/u-boot.img")"
 
 linux_dir="$(readlink -m "sw/hps/linux")"
-linux_src_git_repo="https://github.com/torvalds/linux.git"
+linux_src_git_repo="https://github.com/altera-opensource/linux-socfpga.git"
 linux_src_dir="$(readlink -m "${linux_dir}/source")"
 linux_kernel_mem_arg="1024M"
 linux_zImage_file="$(readlink -m "${linux_src_dir}/arch/arm/boot/zImage")"
@@ -302,13 +302,18 @@ compile_linux() {
     # clean up source tree
     make distclean
 
-    # checkout the following commit (tested and working):
-    # commit 9735a22799b9214d17d3c231fe377fc852f042e9
-    # Author: Linus Torvalds <torvalds@linux-foundation.org>
-    # Date:   Sun Apr 3 09:09:40 2016 -0500
+    # checkout the following commit from the socfpga-4.5 branch (tested and working):
+    # commit ffea805b5209e0e6ad8645217f5ab742455a066b
+    # Author: Dinh Nguyen <dinguyen@opensource.altera.com>
+    # Date:   Tue May 3 08:59:01 2016 -0500
     #
-    #     Linux 4.6-rc2
-    git checkout 9735a22799b9214d17d3c231fe377fc852f042e9
+    #     ARM: dts: socfpga: add ethernet alias on Arria10
+    #
+    #     Without having an ethernet alias, ethernet will have a random MAC address,
+    #     versus take an address that was provided from the bootloader.
+    #
+    #     Signed-off-by: Dinh Nguyen <dinguyen@opensource.altera.com>
+    git checkout ffea805b5209e0e6ad8645217f5ab742455a066b
 
     # create kernel config for socfpga architecture
     make socfpga_defconfig
