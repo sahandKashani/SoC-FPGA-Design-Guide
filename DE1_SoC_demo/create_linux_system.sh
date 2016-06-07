@@ -5,13 +5,11 @@ script_dir_abs=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd "${script_dir_abs}"
 
 # constants ####################################################################
-sdcard_dev="$(readlink -m "${1}")"
-
 quartus_dir="$(readlink -m "hw/quartus")"
 quartus_project_name="$(basename "$(find "${quartus_dir}" -name "*.qpf")" .qpf)"
 quartus_sof_file="$(readlink -m "${quartus_dir}/output_files/${quartus_project_name}.sof")"
 
-fpga_device_part_number="5CSEMA5F31C6"
+fpga_device_part_number="5CSEMA5F31C6" # 5CSEMA4U23C6
 
 preloader_dir="$(readlink -m "sw/hps/preloader")"
 preloader_settings_dir="$(readlink -m "${quartus_dir}/hps_isw_handoff/soc_system_hps_0")"
@@ -21,15 +19,20 @@ preloader_bin_file="${preloader_dir}/preloader-mkpimage.bin"
 
 uboot_src_dir="$(readlink -m "sw/hps/u-boot")"
 uboot_src_git_repo="git://git.denx.de/u-boot.git"
+uboot_src_git_checkout_commit="b104b3dc1dd90cdbf67ccf3c51b06e4f1592fe91"
+uboot_src_make_config_file="socfpga_cyclone5_config" # socfpga_de0_nano_soc_defconfig
+uboot_src_config_file="${uboot_src_dir}/include/configs/socfpga_cyclone5_socdk.h" # socfpga_de0_nano_soc.h
 uboot_script_file="$(readlink -m "${uboot_src_dir}/u-boot.script")"
 uboot_img_file="$(readlink -m "${uboot_src_dir}/u-boot.img")"
 
 linux_dir="$(readlink -m "sw/hps/linux")"
 linux_src_git_repo="https://github.com/altera-opensource/linux-socfpga.git"
 linux_src_dir="$(readlink -m "${linux_dir}/source")"
+linux_src_git_checkout_commit="ffea805b5209e0e6ad8645217f5ab742455a066b"
+linux_src_make_config_file="socfpga_defconfig"
 linux_kernel_mem_arg="1024M"
 linux_zImage_file="$(readlink -m "${linux_src_dir}/arch/arm/boot/zImage")"
-linux_dtb_file="$(readlink -m "${linux_src_dir}/arch/arm/boot/dts/socfpga_cyclone5_socdk.dtb")"
+linux_dtb_file="$(readlink -m "${linux_src_dir}/arch/arm/boot/dts/socfpga_cyclone5_socdk.dtb")" # socfpga_cyclone5_de0_sockit.dtb
 
 rootfs_dir="${linux_dir}/rootfs"
 rootfs_chroot_dir="$(readlink -m ${rootfs_dir}/ubuntu-core-rootfs)"
@@ -44,6 +47,8 @@ sdcard_fat32_uboot_scr_file="$(readlink -m "${sdcard_fat32_dir}/u-boot.scr")"
 sdcard_fat32_zImage_file="$(readlink -m "${sdcard_fat32_dir}/zImage")"
 sdcard_fat32_dtb_file="$(readlink -m "${sdcard_fat32_dir}/socfpga.dtb")"
 
+sdcard_dev="$(readlink -m "${1}")"
+
 sdcard_ext3_rootfs_tgz_file="$(readlink -m "sdcard/ext3_rootfs.tar.gz")"
 
 sdcard_a2_dir="$(readlink -m "sdcard/a2")"
@@ -52,14 +57,18 @@ sdcard_a2_preloader_bin_file="$(readlink -m "${sdcard_a2_dir}/$(basename "${prel
 sdcard_partition_size_fat32="32M"
 sdcard_partition_size_linux="512M"
 
+sdcard_partition_number_fat32="1"
+sdcard_partition_number_ext3="2"
+sdcard_partition_number_a2="3"
+
 if [ "$(echo "${sdcard_dev}" | grep -P "/dev/sd\w.*$")" ]; then
-    sdcard_dev_fat32_id="1"
-    sdcard_dev_ext3_id="2"
-    sdcard_dev_a2_id="3"
+    sdcard_dev_fat32_id="${sdcard_partition_number_fat32}"
+    sdcard_dev_ext3_id="${sdcard_partition_number_ext3}"
+    sdcard_dev_a2_id="${sdcard_partition_number_a2}"
 elif [ "$(echo "${sdcard_dev}" | grep -P "/dev/mmcblk\w.*$")" ]; then
-    sdcard_dev_fat32_id="p1"
-    sdcard_dev_ext3_id="p2"
-    sdcard_dev_a2_id="p3"
+    sdcard_dev_fat32_id="p${sdcard_partition_number_fat32}"
+    sdcard_dev_ext3_id="p${sdcard_partition_number_ext3}"
+    sdcard_dev_a2_id="p${sdcard_partition_number_a2}"
 fi
 
 sdcard_dev_fat32="${sdcard_dev}${sdcard_dev_fat32_id}"
@@ -226,50 +235,138 @@ compile_uboot() {
     make distclean
 
     # checkout the following commit (tested and working):
-    # commit 4ed6ed3c27a069a00c8a557d606a05276cc4653e
-    # Merge: 7e10a7c 07654ba
-    # Author: Tom Rini <trini@konsulko.com>
-    # Date:   Mon Apr 4 14:34:09 2016 -0400
-    #
-    #     Merge branch 'master' of git://www.denx.de/git/u-boot-microblaze
-    git checkout 4ed6ed3c27a069a00c8a557d606a05276cc4653e
+    git checkout "${uboot_src_git_checkout_commit}"
 
-    # create uboot config for socfpga_cyclone5 architecture
-    make socfpga_cyclone5_config
+    # configure uboot for socfpga_cyclone5 architecture
+    make "${uboot_src_make_config_file}"
+
+    ## patch the uboot configuration file that describes environment variables
+    # replace value of CONFIG_BOOTCOMMAND macro (we will always use a script for configuring everything)
+    # result:
+    #     #define CONFIG_BOOTCOMMAND  "run callscript"
+    perl -pi -e 's/^(#define\s+CONFIG_BOOTCOMMAND)(.*)/$1\t"run callscript"/g' "${uboot_src_config_file}"
+
+    # replace value of CONFIG_EXTRA_ENV_SETTINGS macro
+    # result:
+    #     #define CONFIG_EXTRA_ENV_SETTINGS \
+    #         "scriptfile=u-boot.scr" "\0" \
+    #         "fpgadata=0x2000000" "\0" \
+    #         "callscript=fatload mmc 0:1 $fpgadata $scriptfile;" \
+    #             "source $fpgadata" "\0"
+    perl -pi -e 'BEGIN{undef $/;} s/^(#define\s+CONFIG_EXTRA_ENV_SETTINGS)(.*)#include/$1\t"scriptfile=u-boot.scr\\0" "fpgadata=0x2000000\\0" "callscript=fatload mmc 0:1 \$fpgadata \$scriptfile; source \$fpgadata\\0"\n\n#include/smg' "${uboot_src_config_file}"
 
     # compile uboot
     make -j4
 
     # create uboot script
     cat <<EOF > "${uboot_script_file}"
-echo --- Programming FPGA ---
+################################################################################
+echo --- Resetting Env variables ---
 
-# Load rbf from FAT partition into memory
-fatload mmc 0:1 \$fpgadata $(basename ${sdcard_fat32_rbf_file});
-
-# Program FPGA
-fpga load 0 \$fpgadata \$filesize;
-
-# enable the FPGA 2 HPS and HPS 2 FPGA bridges
-run bridge_enable_handoff;
+# reset environment variables to default
+env default -a
 
 echo --- Setting Env variables ---
 
-# Set the devicetree image to be used
-setenv fdtimage $(basename ${sdcard_fat32_dtb_file});
+# rstmgr -> brgmodrst register (hps2fpga & fpga2hps axi bridges)
+setenv axibridge ffd0501c
 
-# Set the kernel image to be used
+# data to be written to rstmgr -> brgmodrst register
+setenv axibridge_handoff 0x00000000
+
+# serial port baudrate
+setenv baudrate 115200
+
+# Set the kernel image
 setenv bootimage $(basename ${sdcard_fat32_zImage_file});
 
-setenv mmcboot 'setenv bootargs mem=${linux_kernel_mem_arg} console=ttyS0,115200 root=\${mmcroot} rw rootwait; bootz \${loadaddr} - \${fdtaddr}';
+# command to disable all bridges
+setenv bridge_disable 'mw \${fpgaintf} 0; \
+mw \${fpga2sdram} 0; \
+mw \${axibridge} 0; \
+mw \${l3remap} 0x1; \
+md \${fpgaintf} 1; \
+md \${fpga2sdram} 1; \
+md \${axibridge} 1'
 
+# command to enable all bridges
+setenv bridge_enable_handoff 'mw \${fpgaintf} \${fpgaintf_handoff}; \
+mw \${fpga2sdram} \${fpga2sdram_handoff}; \
+mw \${axibridge} \${axibridge_handoff}; \
+mw \${l3remap} \${l3remap_handoff}; \
+md \${fpgaintf} 1; \
+md \${fpga2sdram} 1; \
+md \${axibridge} 1'
+
+# address to which the device tree will be loaded
+setenv fdtaddr 0x00000100
+
+# Set the devicetree image
+setenv fdtimage $(basename ${sdcard_fat32_dtb_file});
+
+# sdr -> fpgaportrst register (sdram controller module : fpga2sdram)
+setenv fpga2sdram ffc25080
+
+# data to be written to sdr -> fpgaportrst register
+setenv fpga2sdram_handoff 0x00000000
+
+# sysmgr -> module register (used to disable signals from the FPGA fabric to individual HPS modules)
+setenv fpgaintf ffd08028
+
+# data to be written to sysmgr -> module register
+setenv fpgaintf_handoff 0x00000000
+
+# l3gpv -> remap register
+setenv l3remap ff800000
+
+# data to be written to l3gpv -> remap
+setenv l3remap_handoff 0x00000019
+
+# set kernel boot arguments, then boot the kernel
+setenv mmcboot 'setenv bootargs mem=${linux_kernel_mem_arg} console=ttyS0,115200 root=\${mmcroot} rw rootwait; \
+bootz \${loadaddr} - \${fdtaddr}';
+
+# load linux kernel image and device tree to memory
+setenv mmcload 'mmc rescan; \
+\${mmcloadcmd} mmc 0:\${mmcloadpart} \${loadaddr} \${bootimage}; \
+\${mmcloadcmd} mmc 0:\${mmcloadpart} \${fdtaddr} \${fdtimage}'
+
+# command to be executed to read from sdcard
+setenv mmcloadcmd fatload
+
+# sdcard fat32 partition number
+setenv mmcloadpart ${sdcard_partition_number_fat32}
+
+# sdcard ext3 identifier
+setenv mmcroot /dev/mmcblk0p${sdcard_partition_number_ext3}
+
+# standard input/output
+setenv stderr serial
+setenv stdin serial
+setenv stdout serial
+
+# save environment to sdcard (not needed, but useful to avoid CRC errors on a new sdcard)
+saveenv
+
+################################################################################
+echo --- Programming FPGA ---
+
+# load rbf from FAT partition into memory
+fatload mmc 0:1 \${fpgadata} $(basename ${sdcard_fat32_rbf_file});
+
+# program FPGA
+fpga load 0 \${fpgadata} \${filesize};
+
+# enable the FPGA-2-HPS and HPS-2-FPGA bridges
+run bridge_enable_handoff;
+
+################################################################################
 echo --- Booting Linux ---
 
-# mmcload & mmcboot are scripts included in the default socfpga uboot environment
-# it loads the devicetree image and kernel to memory
+# load linux kernel image and device tree to memory
 run mmcload;
 
-# mmcboot sets the bootargs and boots the kernel with the dtb specified above
+# set kernel boot arguments, then boot the kernel
 run mmcboot;
 EOF
 
@@ -302,21 +399,11 @@ compile_linux() {
     # clean up source tree
     make distclean
 
-    # checkout the following commit from the socfpga-4.5 branch (tested and working):
-    # commit ffea805b5209e0e6ad8645217f5ab742455a066b
-    # Author: Dinh Nguyen <dinguyen@opensource.altera.com>
-    # Date:   Tue May 3 08:59:01 2016 -0500
-    #
-    #     ARM: dts: socfpga: add ethernet alias on Arria10
-    #
-    #     Without having an ethernet alias, ethernet will have a random MAC address,
-    #     versus take an address that was provided from the bootloader.
-    #
-    #     Signed-off-by: Dinh Nguyen <dinguyen@opensource.altera.com>
-    git checkout ffea805b5209e0e6ad8645217f5ab742455a066b
+    # checkout the following commit (tested and working):
+    git checkout "${linux_src_git_checkout_commit}"
 
-    # create kernel config for socfpga architecture
-    make socfpga_defconfig
+    # configure kernel for socfpga architecture
+    make "${linux_src_make_config_file}"
 
     # compile zImage
     make -j4 zImage
