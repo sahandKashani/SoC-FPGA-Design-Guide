@@ -3,7 +3,7 @@
 #
 # BOARD         : DE1-SoC from Terasic
 # Author        : Sahand Kashani-Akhavan from Terasic documentation
-# Revision      : 1.3
+# Revision      : 1.4
 # Creation date : 04/02/2015
 #
 # Syntax Rule : GROUP_NAME_N[bit]
@@ -858,10 +858,6 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_FLASH_DATA[3]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_FLASH_DATA_3
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_FLASH_DCLK
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_FLASH_NCSO
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_GPIO[0]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_GPIO_0
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_GPIO[1]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_GPIO_1
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_GSENSOR_INT
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_I2C1_SCLK
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_I2C1_SDAT
@@ -870,6 +866,7 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_I2C2_SDAT
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_I2C_CONTROL
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_KEY_N
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_LED
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_LTC_GPIO
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_SD_CLK
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_SD_CMD
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_SD_DATA[0]
