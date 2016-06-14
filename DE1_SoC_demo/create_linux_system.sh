@@ -268,59 +268,14 @@ env default -a
 
 echo --- Setting Env variables ---
 
-# rstmgr -> brgmodrst register (hps2fpga & fpga2hps axi bridges)
-setenv axibridge ffd0501c
-
-# data to be written to rstmgr -> brgmodrst register
-setenv axibridge_handoff 0x00000000
-
-# serial port baudrate
-setenv baudrate 115200
-
 # Set the kernel image
 setenv bootimage $(basename ${sdcard_fat32_zImage_file});
-
-# command to disable all bridges
-setenv bridge_disable 'mw \${fpgaintf} 0; \
-mw \${fpga2sdram} 0; \
-mw \${axibridge} 0; \
-mw \${l3remap} 0x1; \
-md \${fpgaintf} 1; \
-md \${fpga2sdram} 1; \
-md \${axibridge} 1'
-
-# command to enable all bridges
-setenv bridge_enable_handoff 'mw \${fpgaintf} \${fpgaintf_handoff}; \
-mw \${fpga2sdram} \${fpga2sdram_handoff}; \
-mw \${axibridge} \${axibridge_handoff}; \
-mw \${l3remap} \${l3remap_handoff}; \
-md \${fpgaintf} 1; \
-md \${fpga2sdram} 1; \
-md \${axibridge} 1'
 
 # address to which the device tree will be loaded
 setenv fdtaddr 0x00000100
 
 # Set the devicetree image
 setenv fdtimage $(basename ${sdcard_fat32_dtb_file});
-
-# sdr -> fpgaportrst register (sdram controller module : fpga2sdram)
-setenv fpga2sdram ffc25080
-
-# data to be written to sdr -> fpgaportrst register
-setenv fpga2sdram_handoff 0x00000000
-
-# sysmgr -> module register (used to disable signals from the FPGA fabric to individual HPS modules)
-setenv fpgaintf ffd08028
-
-# data to be written to sysmgr -> module register
-setenv fpgaintf_handoff 0x00000000
-
-# l3gpv -> remap register
-setenv l3remap ff800000
-
-# data to be written to l3gpv -> remap
-setenv l3remap_handoff 0x00000019
 
 # set kernel boot arguments, then boot the kernel
 setenv mmcboot 'setenv bootargs mem=${linux_kernel_mem_arg} console=ttyS0,115200 root=\${mmcroot} rw rootwait; \
@@ -357,8 +312,8 @@ fatload mmc 0:1 \${fpgadata} $(basename ${sdcard_fat32_rbf_file});
 # program FPGA
 fpga load 0 \${fpgadata} \${filesize};
 
-# enable the FPGA-2-HPS and HPS-2-FPGA bridges
-run bridge_enable_handoff;
+# enable HPS-to-FPGA, FPGA-to-HPS, LWHPS-to-FPGA bridges
+bridge enable;
 
 ################################################################################
 echo --- Booting Linux ---
