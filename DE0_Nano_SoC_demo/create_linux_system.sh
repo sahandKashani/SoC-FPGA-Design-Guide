@@ -38,8 +38,8 @@ rootfs_dir="${linux_dir}/rootfs"
 rootfs_chroot_dir="$(readlink -m ${rootfs_dir}/ubuntu-core-rootfs)"
 rootfs_src_tgz_link="http://cdimage.ubuntu.com/ubuntu-base/releases/14.04.5/release/ubuntu-base-14.04.5-base-armhf.tar.gz"
 rootfs_src_tgz_file="$(readlink -m "${rootfs_dir}/${rootfs_src_tgz_link##*/}")"
-rootfs_system_config_script_file="${rootfs_dir}/rootfs_config.sh"
-rootfs_post_install_config_script_file="${rootfs_dir}/post_install_config.sh"
+rootfs_system_config_script_file="${rootfs_dir}/config_system.sh"
+rootfs_post_install_config_script_file="${rootfs_dir}/config_post_install.sh"
 
 sdcard_fat32_dir="$(readlink -m "sdcard/fat32")"
 sdcard_fat32_rbf_file="$(readlink -m "${sdcard_fat32_dir}/socfpga.rbf")"
@@ -413,7 +413,7 @@ create_rootfs() {
 #
 # By default this script does nothing.
 
-/rootfs_config.sh
+/$(basename ${rootfs_system_config_script_file})
 
 exit 0
 EOF
