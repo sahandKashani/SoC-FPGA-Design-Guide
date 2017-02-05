@@ -13,15 +13,6 @@
 #include "socal/socal.h"
 #include "../hps_soc_system.h"
 
-// State variables
-bool hex_increment = true;
-
-void setup_peripherals() {
-    setup_hps_timer();
-    setup_hps_gpio();
-    setup_hex_displays();
-}
-
 void setup_hps_timer() {
     assert(ALT_E_SUCCESS == alt_globaltmr_init());
 }
@@ -37,8 +28,9 @@ void setup_hps_gpio() {
     assert(ALT_E_SUCCESS == alt_gpio_group_config(hps_gpio_config, hps_gpio_config_len));
 }
 
-void setup_hex_displays() {
-    set_hex_displays(0);
+void setup_fpga_leds() {
+    // Switch on first LED only
+    alt_write_word(fpga_leds, 0x1);
 }
 
 /* The HPS doesn't have a sleep() function like the Nios II, so we can make one
@@ -56,27 +48,6 @@ void delay_us(uint32_t us) {
     while(alt_globaltmr_get64() < end_time);
 }
 
-void set_hex_displays(uint32_t value) {
-	char current_char[2] = " \0";
-	char hex_counter_hex_string[HEX_DISPLAY_COUNT + 1];
-
-    // get hex string representation of input value on HEX_DISPLAY_COUNT 7-segment displays
-    snprintf(hex_counter_hex_string, HEX_DISPLAY_COUNT + 1, "%0*x", HEX_DISPLAY_COUNT, (unsigned int) value);
-
-	uint32_t hex_display_index = 0;
-	for (hex_display_index = 0; hex_display_index < HEX_DISPLAY_COUNT; hex_display_index++) {
-		current_char[0] = hex_counter_hex_string[HEX_DISPLAY_COUNT - hex_display_index - 1];
-
-		// get decimal representation for this 7-segment display
-		uint32_t number = (uint32_t) strtol(current_char, NULL, 16);
-
-		// use lookup table to find active-low value to represent number on the 7-segment display
-		uint32_t hex_value_to_write = hex_display_table[number];
-
-		alt_write_word(fpga_hex_displays[hex_display_index], hex_value_to_write);
-	}
-}
-
 void handle_hps_led() {
     uint32_t hps_gpio_input = alt_gpio_port_data_read(HPS_KEY_N_PORT, HPS_KEY_N_MASK);
 
@@ -92,44 +63,32 @@ void handle_hps_led() {
     }
 }
 
-bool is_fpga_button_pressed(uint32_t button_number) {
-	// buttons are active-low
-	return ((~alt_read_word(fpga_buttons)) & (1 << button_number));
-}
+void handle_fpga_leds() {
+    uint32_t leds_mask = alt_read_word(fpga_leds);
 
-void handle_hex_displays(uint32_t *hex_counter) {
-    // FPGA button 0 will invert the counting direction
-    if (is_fpga_button_pressed(0)) {
-        hex_increment = !hex_increment;
-    }
-
-    if (hex_increment) {
-        *hex_counter += 1;
+    if (leds_mask != (0x01 << (HPS_FPGA_LEDS_DATA_WIDTH - 1))) {
+        // rotate leds
+        leds_mask <<= 1;
     } else {
-        *hex_counter -= 1;
+        // reset leds
+        leds_mask = 0x1;
     }
 
-    // FPGA button 1 will reset the counter to 0
-    if (is_fpga_button_pressed(1)) {
-        *hex_counter = 0;
-    }
-
-    // restrict hex_counter to HEX_DISPLAY_COUNT digits
-    *hex_counter &= HEX_COUNTER_MASK;
-    set_hex_displays(*hex_counter);
+    alt_write_word(fpga_leds, leds_mask);
 }
 
 int main() {
-	printf("DE1-SoC bare-metal demo\n");
+    printf("DE0-Nano-SoC bare-metal demo\n");
 
-	setup_peripherals();
+    setup_hps_timer();
+    setup_hps_gpio();
+    setup_fpga_leds();
 
-	uint32_t hex_counter = 0;
-	while (true) {
-	    handle_hex_displays(&hex_counter);
-		handle_hps_led();
-		delay_us(ALT_MICROSECS_IN_A_SEC / 10);
-	}
+    while (true) {
+        handle_hps_led();
+        handle_fpga_leds();
+        delay_us(ALT_MICROSECS_IN_A_SEC / 10);
+    }
 
-	return 0;
+    return 0;
 }
