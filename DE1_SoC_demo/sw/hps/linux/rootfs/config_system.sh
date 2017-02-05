@@ -67,10 +67,6 @@ addgroup ${username} sudo
 # when remote debugging)
 echo -e "${password}\n${password}\n" | passwd root
 
-# allow root SSH login with password (needed so we can use ARM DS-5 for remote
-# debugging)
-perl -pi -e 's/^(PermitRootLogin) without-password$/$1 yes/g' "/etc/ssh/sshd_config"
-
 # remove "/rootfs_config.sh" from /etc/rc.local to avoid reconfiguring system on
 # next boot
 tee "/etc/rc.local" > "/dev/null" <<EOF
