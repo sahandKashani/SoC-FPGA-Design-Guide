@@ -176,7 +176,7 @@ architecture rtl of DE0_Nano_SoC_top_level is
     end component soc_system;
 
 begin
-    u0 : component soc_system
+    soc_system_inst : component soc_system
         port map(
             clk_clk                                  => FPGA_CLK1_50,
             hps_0_ddr_mem_a                          => HPS_DDR3_ADDR,
