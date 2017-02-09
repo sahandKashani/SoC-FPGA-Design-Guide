@@ -28,7 +28,7 @@ void handle_leds() {
 }
 
 int main() {
-    printf("DE0-Nano-SoC nios demo\n");
+    printf("DE1-SoC nios demo\n");
 
     setup_leds();
 

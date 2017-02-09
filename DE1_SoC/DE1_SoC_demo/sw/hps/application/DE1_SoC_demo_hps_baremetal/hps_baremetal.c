@@ -78,7 +78,7 @@ void handle_fpga_leds() {
 }
 
 int main() {
-    printf("DE0-Nano-SoC bare-metal demo\n");
+    printf("DE1-SoC bare-metal demo\n");
 
     setup_hps_timer();
     setup_hps_gpio();

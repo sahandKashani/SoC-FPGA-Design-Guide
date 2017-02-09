@@ -158,7 +158,7 @@ void handle_fpga_leds() {
 }
 
 int main() {
-    printf("DE0-Nano-SoC linux demo\n");
+    printf("DE1-SoC linux demo\n");
 
     open_physical_memory_device();
     mmap_peripherals();
