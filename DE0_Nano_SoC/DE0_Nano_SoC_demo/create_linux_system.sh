@@ -1,5 +1,12 @@
 #!/bin/bash -x
 
+# ===================================================================================
+# usage: create_linux_system.sh [sdcard_device]
+#
+# positional arguments:
+#     sdcard_device    path to sdcard device file    [ex: "/dev/sdb", "/dev/mmcblk0"]
+# ===================================================================================
+
 # make sure to be in the same directory as this script
 script_dir_abs=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd "${script_dir_abs}"
@@ -77,23 +84,6 @@ sdcard_dev_ext3="${sdcard_dev}${sdcard_dev_ext3_id}"
 sdcard_dev_a2="${sdcard_dev}${sdcard_dev_a2_id}"
 sdcard_dev_fat32_mount_point="$(readlink -m "sdcard/mount_point_fat32")"
 sdcard_dev_ext3_mount_point="$(readlink -m "sdcard/mount_point_ext3")"
-
-# usage() ######################################################################
-usage() {
-    cat <<EOF
-===================================================================================
-usage: create_linux_system.sh [sdcard_device]
-
-positional arguments:
-    sdcard_device    path to sdcard device file    [ex: "/dev/sdb", "/dev/mmcblk0"]
-===================================================================================
-EOF
-}
-
-# echoerr() ####################################################################
-echoerr() {
-    cat <<< "${@}" 1>&2;
-}
 
 # compile_quartus_project() ####################################################
 compile_quartus_project() {
@@ -493,13 +483,14 @@ write_sdcard() {
 }
 
 # Script execution #############################################################
-if [ ! -d "${sdcard_a2_dir}" ]; then
-    mkdir -p "${sdcard_a2_dir}"
-fi
 
-if [ ! -d "${sdcard_fat32_dir}" ]; then
-    mkdir -p "${sdcard_fat32_dir}"
-fi
+# Report script line number on any error (non-zero exit code).
+trap 'echo "Error on line ${LINENO}" 1>&2' ERR
+set -e
+
+# Create sdcard output directories
+mkdir -p "${sdcard_a2_dir}"
+mkdir -p "${sdcard_fat32_dir}"
 
 compile_quartus_project
 compile_preloader
@@ -507,13 +498,13 @@ compile_uboot
 compile_linux
 create_rootfs
 
-if [ ! -b "${sdcard_dev}" ]; then
-    usage
-    echoerr "Error: could not find block device at \"${sdcard_dev}\""
-    exit 1
-fi
+# Write sdcard if it exists
+if [ -z "${sdcard_dev}" ]; then
+    echo "sdcard argument not provided => no sdcard written."
 
-partition_sdcard
-write_sdcard
+elif [ -b "${sdcard_dev}" ]; then
+    partition_sdcard
+    write_sdcard
+fi
 
 # Make sure MSEL = 000000
